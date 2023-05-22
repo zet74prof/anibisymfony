@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Création visite{% endblock %}
+
+{% block body %}
+    <div class="row m-3 text-center">
+        <h1>Nouvelle entrée</h1>
+    </div>
+    <div class="row m-3">
+        <form action="{{ path('app_create_visite')}}" method="post">
+            <div class="row">
+                <div class="col-lg-6 col-sm-12">
+                    <div class="row mb-1">
+                        <label class="col-4 col-form-label" for="nbAdultes">
+                            Nombre d'entrées Adulte
+                        </label>
+                        <div class="col-6">
+                            <input class="form-control" required type="number" min="0" value="{{ visite.nbVisiteursAdultes }}" id="nbAdultes" name="nbAdultes">
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <label class="col-4 col-form-label" for="nbEnfants">
+                            Nombre d'entrées Enfant
+                        </label>
+                        <div class="col-6">
+                            <input class="form-control" required type="number" min="0" value="{{ visite.nbVisiteursEnfants }}" id="nbEnfants" name="nbEnfants">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-sm-12">
+                    <div class="row">
+                        {% for expo in expos %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" {% if expo in visite.expositions %}checked{% endif %}  id="{{ expo.id }}" name="{{ expo.id }}">
+                            <label class="form-check-label" for="{{ expo.id }}">
+                                {{ expo.nomExpo }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="row m-3">
+                <div class="col-6 d-md-flex justify-content-md-end">
+                    <button type="submit" name="calculerTarif" class="btn btn-primary">Calculer tarif</button>
+                </div>
+                <div class="col-6 d-md-flex justify-content-md-start">
+                    <button type="submit" name="valider" class="btn btn-primary">Valider</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row m-3 text-center">
+        <p>A payer: {{ visite.calculerTarif }} €</p>
+    </div>
+    <div class="row m-3 text-center">
+        <p class="text-danger">{% if message is not null %}{{ message }}{% endif %}</p>
+    </div>
+{% endblock %}
