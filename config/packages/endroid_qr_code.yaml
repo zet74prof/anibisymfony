@@ -1,0 +1,18 @@
+endroid_qr_code:
+    default:
+        writer: Endroid\QrCode\Writer\PngWriter
+        size: 300
+        margin: 10
+        encoding: 'UTF-8'
+        errorCorrectionLevel: 'low'
+        roundBlockSizeMode: 'margin'
+        validateResult: false
+    custom:
+        writer: Endroid\QrCode\Writer\SvgWriter
+        size: 300
+        encoding: 'UTF-8'
+        errorCorrectionLevel: 'low' # 'low', 'medium', 'quartile', or 'high'
+        roundBlockSizeMode: 'shrink'
+        logoPath: 'images/anibis-logo-share.png'
+        logoResizeToWidth: 50
+        validateResult: false

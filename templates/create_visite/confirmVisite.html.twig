@@ -16,4 +16,7 @@
 <div class="row m-3 text-center">
     <a href="{{ path('app_create_visite') }}"><button class="btn btn-primary">Enregistrer une nouvelle entrée</button></a>
 </div>
+<div class="row">
+    <img class="image-fluid" src="{{ qr_code_data_uri(visite.id, 'custom') }}">
+</div>
 {% endblock %}

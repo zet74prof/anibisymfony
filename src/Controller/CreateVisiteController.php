@@ -5,6 +5,15 @@ namespace App\Controller;
 use App\Entity\Exposition;
 use App\Entity\Visite;
 use Doctrine\Persistence\ManagerRegistry;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Writer\SvgWriter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +24,7 @@ class CreateVisiteController extends AbstractController
     #[Route('/', name: 'app_create_visite', methods: ['POST', 'GET'])]
     public function index(ManagerRegistry $doctrine, Request $request): Response
     {
-        $jauge = 5;
+        $jauge = 500;
         $message = null;
         $nbVisiteursEnCours = 0;
         $visitesEnCours = $doctrine->getRepository(Visite::class)->findBy(['dateHeureDepart' => null]);
@@ -46,8 +55,28 @@ class CreateVisiteController extends AbstractController
             if ($visite->checkAtLeastOneVisitor() === true && $visite->getExpositions()->count() != 0 && $nbVisiteursEnCours <= $jauge) {
                 $doctrine->getManager()->persist($visite);
                 $doctrine->getManager()->flush();
+
+                $writer = new PngWriter();
+
+                // Create QR code
+                $qrCode = QrCode::create($visite->getId())
+                    ->setEncoding(new Encoding('UTF-8'))
+                    ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+                    ->setSize(300)
+                    ->setMargin(1)
+                    ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+                    ->setForegroundColor(new Color(0, 0, 0))
+                    ->setBackgroundColor(new Color(255, 255, 255));
+
+                // Create generic logo
+                $logo = Logo::create('images/anibis-logo-share.png')
+                    ->setResizeToWidth(50);
+
+                $qrCodeResult = $writer->write($qrCode, $logo);
+
                 return $this->render('create_visite/confirmVisite.html.twig', [
                     'visite' => $visite,
+                    'qrCode' => $qrCodeResult,
                 ]);
             } elseif (!$visite->checkAtLeastOneVisitor()) {
                 $message = 'Vous devez ajouter au moins un adulte ou enfant';
